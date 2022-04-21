@@ -3,6 +3,7 @@ package com.example.notesappmvvm
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.notesappmvvm.database.firebase.AppFirebaseRepository
 import com.example.notesappmvvm.database.room.AppRoomDatabase
 import com.example.notesappmvvm.database.room.repository.RoomRepository
 import com.example.notesappmvvm.model.Note
@@ -23,8 +24,15 @@ class MainViewModel (application: Application) : AndroidViewModel(application){
             TYPE_ROOM -> {
             val dao = AppRoomDatabase.getInstance(context = context).getRoomDao()
             REPOSITORY = RoomRepository(dao)
-                onSuccess()
+             onSuccess()
           }
+            TYPE_FIREBASE -> {
+               REPOSITORY = AppFirebaseRepository()
+               REPOSITORY.connectToDatabase(
+                   { onSuccess() },
+                   { Log.d("checkData", "Error: ${it}")}
+               )
+            }
        }
     }
     fun addNote(note: Note, onSuccess: () -> Unit){
