@@ -67,6 +67,7 @@ fun StartScreen(navController: NavHostController, viewModel: MainViewModel) {
                             LOGIN =login
                             PASSWORD = password
                            viewModel.initDatabase(TYPE_FIREBASE){
+                               navController.navigate(NavRoute.Main.route)
                              Log.d("checkData", "Auth success")
                            }
                         },
