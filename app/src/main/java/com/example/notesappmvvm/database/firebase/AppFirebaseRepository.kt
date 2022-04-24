@@ -11,6 +11,7 @@ import com.example.notesappmvvm.utils.PASSWORD
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlin.math.log
 
 class AppFirebaseRepository : DatabaseRepository {
 
@@ -36,11 +37,24 @@ class AppFirebaseRepository : DatabaseRepository {
     }
 
     override suspend fun update(note: Note, onSuccess: () -> Unit) {
-        TODO("Not yet implemented")
+        val noteId = note.firebaseId
+        val mapNotes = hashMapOf<String, Any>()
+
+        mapNotes[FIREBASE_ID] = noteId
+        mapNotes[Constants.Keys.TITLE] = note.title
+        mapNotes[Constants.Keys.SUBTITLE] = note.subtitle
+
+        database.child(noteId)
+            .updateChildren(mapNotes)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { Log.d("checkData", "Failed to update note") }
     }
 
     override suspend fun delete(note: Note, onSuccess: () -> Unit) {
-        TODO("Not yet implemented")
+        database.child(note.firebaseId).removeValue()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { Log.d("checkData", "Failed to delete note") }
+
     }
 
     override fun signOut() {

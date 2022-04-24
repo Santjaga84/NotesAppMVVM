@@ -22,13 +22,24 @@ import com.example.notesappmvvm.model.Note
 import com.example.notesappmvvm.navigation.NavRoute
 import com.example.notesappmvvm.ui.theme.NotesAppMVVMTheme
 import com.example.notesappmvvm.utils.Constants
+import com.example.notesappmvvm.utils.DB_TYPE
+import com.example.notesappmvvm.utils.TYPE_FIREBASE
+import com.example.notesappmvvm.utils.TYPE_ROOM
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NoteScreen(navController: NavHostController, viewModel: MainViewModel, noteId: String?) {
     val notes = viewModel.readAllNotes().observeAsState(listOf()).value
-    val note = notes.firstOrNull{ it.id == noteId?.toInt()} ?: Note(title = Constants.Keys.NONE , subtitle = Constants.Keys.NONE)
+    val note = when(DB_TYPE){
+        TYPE_ROOM -> {
+            notes.firstOrNull { it.id  == noteId?.toInt() } ?: Note()
+        }
+        TYPE_FIREBASE -> {
+            notes.firstOrNull { it.firebaseId == noteId } ?: Note()
+        }
+        else -> Note()
+    }
     val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
     var title by remember { mutableStateOf(Constants.Keys.EMPTY)}
@@ -66,7 +77,7 @@ fun NoteScreen(navController: NavHostController, viewModel: MainViewModel, noteI
                         modifier = Modifier.padding(top = 16.dp),
                         onClick = {
                         viewModel.updateNote(note =
-                        Note(id = note.id, title = title, subtitle = subtitle)
+                        Note(id = note.id, title = title, subtitle = subtitle, firebaseId = note.firebaseId)
                         ){
                             navController.navigate(NavRoute.Main.route)
                         }
