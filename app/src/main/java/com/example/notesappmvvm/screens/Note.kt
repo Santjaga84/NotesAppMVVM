@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NoteScreen(navController: NavHostController, viewModel: MainViewModel, noteId: String?) {
     val notes = viewModel.readAllNotes().observeAsState(listOf()).value
-    val note = when(DB_TYPE){
+    val note = when(DB_TYPE.value){
         TYPE_ROOM -> {
             notes.firstOrNull { it.id  == noteId?.toInt() } ?: Note()
         }
@@ -137,7 +137,7 @@ fun NoteScreen(navController: NavHostController, viewModel: MainViewModel, noteI
                     }) {
                         Text(text = Constants.Keys.UPDATE)
                     }
-                }
+
                     Button(onClick = {
                       viewModel.deleteNote(note = note){
                           navController.navigate(NavRoute.Main.route)
@@ -153,17 +153,18 @@ fun NoteScreen(navController: NavHostController, viewModel: MainViewModel, noteI
                         .fillMaxWidth(),
                     onClick = {
                     navController.navigate(NavRoute.Main.route)
-                    }) {
-                    Text(text = Constants.Keys.NAV_BACK)
+                    }
+                 ) {
+                        Text(text = Constants.Keys.NAV_BACK)
+                }
             }
         }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
-fun prevNoteScreen(){
+fun prevNoteScreen() {
     NotesAppMVVMTheme {
         val context = LocalContext.current
         val mViewModel: MainViewModel =
